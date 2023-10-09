@@ -10,10 +10,6 @@ import (
 	"mime/multipart"
 
 	"encoding/json"
-
-	"strings"
-
-	"fmt"
 )
 
 type profile struct {
@@ -40,12 +36,6 @@ func postAlbums(c *gin.Context) {
 	}
 
 	profileData, _ := c.GetPostForm("profile")
-
-	// Clean the profileData before parsing it to JSON
-	profileData = cleanProfileString(profileData)
-
-	fmt.Println("Cleaned Profile Data:", profileData)
-
 	var newProfile profile
 	err = json.Unmarshal([]byte(profileData), &newProfile)
 	if err != nil {
@@ -54,27 +44,13 @@ func postAlbums(c *gin.Context) {
 	}
 
 	var newAlbum album
+x
     newAlbum.ID = uuid.New().String()
 	newAlbum.Profile = newProfile
 	newAlbum.Image = image
 
     albums = append(albums, newAlbum)
-    c.JSON(http.StatusCreated, gin.H{"albumID": newAlbum.ID,"imageSize": "size"})
-}
-
-// This function is used to convert AlbumInfo object passed in as profile data into json format
-func cleanProfileString(profileContent string) string {
-    profileContent = strings.Replace(profileContent, "class AlbumsProfile {", "{", -1)
-	profileContent = strings.Replace(profileContent, "artist: ", "\"artist\": \"", -1)
-	profileContent = strings.Replace(profileContent, "title: ", "\",\"title\": \"", -1)
-	profileContent = strings.Replace(profileContent, "year: ", "\",\"year\": \"", -1)
-	profileContent = strings.Replace(profileContent, "}", "\"}", -1)
-	
-	// Additional cleanup
-	profileContent = strings.Replace(profileContent, "\n    ", "", -1)  // Remove newline and spaces
-	profileContent = strings.Replace(profileContent, "\n", "", -1)  // Remove any remaining newline
-
-	return profileContent
+    c.JSON(http.StatusCreated, gin.H{"albumID": newAlbum.ID,"imageSize": image.Size})
 }
 
 // getAlbumByID locates the album whose ID value matches the id
